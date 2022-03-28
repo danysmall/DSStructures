@@ -1,5 +1,6 @@
 """Implementation of stack data structure."""
 import errors
+import typing
 import sys
 
 
@@ -32,8 +33,8 @@ class Stack():
         result = ''
         temp = self._last_element
         while temp is not None:
-            result += f'{temp.get_data()}, '
-            temp = temp.get_prev()
+            result += f'{temp.data}, '
+            temp = temp.prev
         return f'[{result[:-2]}]'
 
     def __repr__(self: 'Stack') -> str:
@@ -68,11 +69,12 @@ class Stack():
         if self._length == 0:
             raise errors.DSStackIsEmpty(target=sys._getframe().f_code.co_name)
 
-        _data_t = self._last_element.get_data()
-        self._last_element = self._last_element.get_prev()
+        _data_t = self._last_element.data
+        self._last_element = self._last_element.prev
         self._length -= 1
         return _data_t
 
+    @property
     def length(self: 'Stack') -> int:
         """Return length of stack.
 
@@ -81,6 +83,7 @@ class Stack():
         """
         return self._length
 
+    @property
     def max_length(self: 'Stack') -> int:
         """Return max_length attribute of stack.
 
@@ -91,22 +94,67 @@ class Stack():
 
 
 class StackData:
-    def __init__(self, data, prev):
+    """Container that saves data in stack.
+
+    Attributes:
+    -----------
+    @data — holds data of element in stack
+    @prev — holds link to the previous element
+
+    Properties:
+    -----------
+    [instance].data — return attribute data
+    [instance].prev — return attribute prev
+
+    Changing of attributes not allowed. In this case will be raised
+    Attribute error
+
+    Example:
+    >>> a = StackData(5, None)
+    >>> print(a.data) # 5
+    >>> print(a.prev) # None
+    >>> a.prev = StackData(6, None)
+    AttributeError: can't ser attribute 'prev'
+    >>> a.data = 10
+    AttributeError: can't ser attribute 'data'
+    """
+
+    def __init__(
+        self: 'StackData',
+        data: typing.Any,
+        prev: typing.Union['StackData', None]
+    ) -> None:
+        """Initialize StackData element."""
         self._data = data
         self._prev = prev
 
-    def __str__(self):
+    def __str__(self: 'StackData') -> str:
+        """Return data of element as string."""
         return str(self._data)
 
-    def __repr__(self):
+    def __repr__(self: 'StackData') -> str:
+        """Call built-in methon __str__()."""
         return self.__str__()
 
-    def get_data(self):
+    @property
+    def data(self: 'StackData') -> typing.Any:
+        """Return data of element."""
         return self._data
 
-    def get_prev(self):
+    @property
+    def prev(self: 'StackData') -> typing.Union['StackData', None]:
+        """Return link to previous node."""
         return self._prev
 
 
 if __name__ == '__main__':
     a = Stack()
+
+    for i in range(20):
+        a.push(i)
+
+    while a.length > 0:
+        print(a.pop())
+
+    x = StackData(2, None)
+    x.prev = 3
